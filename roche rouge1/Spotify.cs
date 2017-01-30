@@ -37,11 +37,18 @@ namespace roche_rouge1
             return FindWindow(windowClassName, null);
         }
 
+        public static void startStopPlaying()
+        {
+            stopPlaying(0);
+        }
+
         public static async void stopPlaying(int time)
         {
 
             await Task.Delay(time * 60000);
             SendMessage(GetSpotify(), 0x0319, IntPtr.Zero, new IntPtr((long)SpotifyAction.PlayPause));
         }
+
+
     }
 }

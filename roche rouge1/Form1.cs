@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using System.Threading;
+using Microsoft.Win32;
 
 namespace roche_rouge1
 {
@@ -56,6 +57,10 @@ namespace roche_rouge1
             {
                 Spotify.stopPlaying(timeInMin);
             }
+            else
+            {
+                Spotify.stopPlaying(0);
+            }
         }
 
         private void textBox1_TextChanged_1(object sender, EventArgs e)
@@ -65,7 +70,34 @@ namespace roche_rouge1
 
         private void shutdown_Click(object sender, EventArgs e)
         {
+        }
 
+        
+        
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void LockDetectOne_Click(object sender, EventArgs e)
+        {
+            robot.startLockDetection();
+        }
+
+        private void lockDetectEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void LockDetectOff_Click(object sender, EventArgs e)
+        {
+            robot.stopLockDetection();
         }
     }
 }

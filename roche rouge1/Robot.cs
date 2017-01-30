@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using Microsoft.Win32;
 
 namespace roche_rouge1
 {
@@ -15,18 +15,17 @@ namespace roche_rouge1
     class Robot
     {
         public Boolean mouseMove;
+        public Boolean lockDetector;
         private  Thread mouseThread;
+        private  Thread lockDetectorThread;
         public Cursor Cursor { get; private set; }
 
-        public const int KEYEVENTF_EXTENTEDKEY = 1;
-        public const int KEYEVENTF_KEYUP = 0;
-        public const int VK_MEDIA_NEXT_TRACK = 0xB0;
-        public const int VK_MEDIA_PLAY_PAUSE = 0xB3;
-        public const int VK_MEDIA_PREV_TRACK = 0xB1;
+        
 
         public Robot()
         {
             mouseMove = false;
+            lockDetector = false;
         }
         [DllImport("user32.dll")]
         public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
@@ -58,19 +57,45 @@ namespace roche_rouge1
                 mouseThread.Start();
             }
         }
+
         public void stopMouseMove()
         {
             mouseMove = false;
         }
 
-        public void stopSpotify()
+        public void startLockDetection()
         {
-            Console.WriteLine("1");
-
-            keybd_event(VK_MEDIA_NEXT_TRACK, 0, KEYEVENTF_EXTENTEDKEY, IntPtr.Zero);
-
-            Console.WriteLine("2");
-
+            if (!lockDetector)
+            {
+                lockDetector = true;
+                lockDetectorThread = new Thread(checkLock);
+                lockDetectorThread.Start();
+            }
         }
+        public void stopLockDetection()
+        {
+            lockDetector = false;
+        }
+
+        private void checkLock()
+        {
+            Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
+        }
+
+        void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
+        {
+            if (e.Reason == SessionSwitchReason.SessionLock)
+            {
+                Console.WriteLine("Lock");
+                Spotify.startStopPlaying();
+            }
+            else if (e.Reason == SessionSwitchReason.SessionUnlock)
+            {
+                Console.WriteLine("UnLock");
+                Spotify.startStopPlaying();
+
+            }
+        }
+
     }
 }
