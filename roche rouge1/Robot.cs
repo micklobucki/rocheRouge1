@@ -68,8 +68,7 @@ namespace roche_rouge1
             if (!lockDetector)
             {
                 lockDetector = true;
-                lockDetectorThread = new Thread(checkLock);
-                lockDetectorThread.Start();
+                Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
             }
         }
         public void stopLockDetection()
@@ -77,21 +76,14 @@ namespace roche_rouge1
             lockDetector = false;
         }
 
-        private void checkLock()
-        {
-            Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
-        }
-
         void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
-            if (e.Reason == SessionSwitchReason.SessionLock)
+            if (e.Reason == SessionSwitchReason.SessionLock && lockDetector)
             {
-                Console.WriteLine("Lock");
                 Spotify.startStopPlaying();
             }
-            else if (e.Reason == SessionSwitchReason.SessionUnlock)
+            else if (e.Reason == SessionSwitchReason.SessionUnlock && lockDetector)
             {
-                Console.WriteLine("UnLock");
                 Spotify.startStopPlaying();
 
             }

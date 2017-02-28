@@ -32,11 +32,15 @@ namespace roche_rouge1
         private void mouseOn_Click(object sender, EventArgs e)
         {
             robot.startMouseMove();
+            CheckBox mouseEnabledCheckbox = (CheckBox)mouseEnabled;
+            mouseEnabledCheckbox.Checked = true;
         }
 
         private void mouseOff_Click(object sender, EventArgs e)
         {
             robot.stopMouseMove();
+            CheckBox mouseEnabledCheckbox = (CheckBox)mouseEnabled;
+            mouseEnabledCheckbox.Checked = false;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -88,6 +92,8 @@ namespace roche_rouge1
         private void LockDetectOne_Click(object sender, EventArgs e)
         {
             robot.startLockDetection();
+            CheckBox lockDetectionCheckbox = (CheckBox)lockDetectEnabled;
+            lockDetectionCheckbox.Checked = true;
         }
 
         private void lockDetectEnabled_CheckedChanged(object sender, EventArgs e)
@@ -98,6 +104,8 @@ namespace roche_rouge1
         private void LockDetectOff_Click(object sender, EventArgs e)
         {
             robot.stopLockDetection();
+            CheckBox lockDetectionCheckbox = (CheckBox)lockDetectEnabled;
+            lockDetectionCheckbox.Checked = false;
         }
     }
 }
