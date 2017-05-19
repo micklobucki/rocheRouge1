@@ -31,11 +31,13 @@ namespace roche_rouge1
 
         private void mouseOn_Click(object sender, EventArgs e)
         {
+            mouseEnabled.Checked = true;
             robot.startMouseMove();
         }
 
         private void mouseOff_Click(object sender, EventArgs e)
         {
+            mouseEnabled.Checked = false;
             robot.stopMouseMove();
         }
 
@@ -87,8 +89,11 @@ namespace roche_rouge1
 
         private void LockDetectOne_Click(object sender, EventArgs e)
         {
+            lockDetectEnabled.Checked = true;
             robot.startLockDetection();
-        }
+
+
+        }                               
 
         private void lockDetectEnabled_CheckedChanged(object sender, EventArgs e)
         {
@@ -97,6 +102,7 @@ namespace roche_rouge1
 
         private void LockDetectOff_Click(object sender, EventArgs e)
         {
+            lockDetectEnabled.Checked = false;
             robot.stopLockDetection();
         }
     }

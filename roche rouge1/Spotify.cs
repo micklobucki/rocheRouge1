@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -47,6 +48,23 @@ namespace roche_rouge1
 
             await Task.Delay(time * 60000);
             SendMessage(GetSpotify(), 0x0319, IntPtr.Zero, new IntPtr((long)SpotifyAction.PlayPause));
+        }
+
+        public static Boolean checkIfSpotifyPlay()
+        {
+            var proc = Process.GetProcessesByName("Spotify").FirstOrDefault(p => !string.IsNullOrWhiteSpace(p.MainWindowTitle));
+
+            if (proc == null)
+            {
+                return false;
+            }
+            Console.WriteLine(proc.MainWindowTitle);
+            if (string.Equals(proc.MainWindowTitle, "Spotify", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return false;
+            }
+
+            return true;
         }
 
 

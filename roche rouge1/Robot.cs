@@ -20,8 +20,6 @@ namespace roche_rouge1
         private  Thread lockDetectorThread;
         public Cursor Cursor { get; private set; }
 
-        
-
         public Robot()
         {
             mouseMove = false;
@@ -30,12 +28,24 @@ namespace roche_rouge1
         [DllImport("user32.dll")]
         public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
 
+        [FlagsAttribute]
+        public enum EXECUTION_STATE : uint
+        {
+            ES_AWAYMODE_REQUIRED = 0x00000040,
+            ES_CONTINUOUS = 0x80000000,
+            ES_DISPLAY_REQUIRED = 0x00000002,
+            ES_SYSTEM_REQUIRED = 0x00000001
+            // Legacy flag, should not be used.
+            // ES_USER_PRESENT = 0x00000004
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
 
         public void mouseMoveer()
         {
             if (!mouseMove)
             {
-                Console.WriteLine(mouseThread.IsAlive);
                 return;
             }
             while (mouseMove)
@@ -52,15 +62,17 @@ namespace roche_rouge1
         {
             if (!mouseMove)
             {
+                SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_AWAYMODE_REQUIRED);
                 mouseMove = true;
-                mouseThread = new Thread(mouseMoveer);
-                mouseThread.Start();
+                //mouseThread = new Thread(mouseMoveer);
+                //mouseThread.Start();
             }
         }
 
         public void stopMouseMove()
         {
             mouseMove = false;
+            SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
         }
 
         public void startLockDetection()
@@ -68,8 +80,7 @@ namespace roche_rouge1
             if (!lockDetector)
             {
                 lockDetector = true;
-                lockDetectorThread = new Thread(checkLock);
-                lockDetectorThread.Start();
+                Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
             }
         }
         public void stopLockDetection()
@@ -77,23 +88,18 @@ namespace roche_rouge1
             lockDetector = false;
         }
 
-        private void checkLock()
-        {
-            Microsoft.Win32.SystemEvents.SessionSwitch += new Microsoft.Win32.SessionSwitchEventHandler(SystemEvents_SessionSwitch);
-        }
-
         void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
-            if (e.Reason == SessionSwitchReason.SessionLock)
+            if (e.Reason == SessionSwitchReason.SessionLock && lockDetector)
             {
-                Console.WriteLine("Lock");
+                if (Spotify.checkIfSpotifyPlay())
+                {
                 Spotify.startStopPlaying();
+                }
             }
-            else if (e.Reason == SessionSwitchReason.SessionUnlock)
+            else if (e.Reason == SessionSwitchReason.SessionUnlock && lockDetector)
             {
-                Console.WriteLine("UnLock");
                 Spotify.startStopPlaying();
-
             }
         }
 
